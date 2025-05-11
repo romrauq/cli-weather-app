@@ -1,0 +1,11 @@
+{
+  "name": "cli-weather-app",
+  "version": "1.0.0",
+  "description": "A CLI application that provides weather information for city provided by the user. ",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "author": "John Quarmor",
+  "license": "ISC"
+}
