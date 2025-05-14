@@ -1,22 +1,9 @@
+require("dotenv").config();
 const axios = require("axios");
-const inquirer = require("inquirer");
-const { getNames } = require("country-list");
+const readline = require("readline-sync");
 
-// Register autocomplete prompt
-inquirer.registerPrompt("autocomplete", require("inquirer-autocomplete-prompt"));
-
-// === CONFIG ===
 const API_KEY = process.env.OPEN_WEATHER_API_KEY;
 
-// Example static city data (you can replace with a more dynamic or API-based source)
-const citiesByCountry = {
-	Ghana: ["Accra", "Kumasi", "Tamale", "Takoradi"],
-	"United States": ["New York", "Los Angeles", "Chicago", "Houston"],
-	"United Kingdom": ["London", "Manchester", "Birmingham", "Liverpool"],
-	Canada: ["Toronto", "Vancouver", "Montreal", "Calgary"],
-};
-
-// Function to fetch weather
 async function getWeather(country, city) {
 	const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(
 		city
@@ -34,46 +21,20 @@ async function getWeather(country, city) {
 	}
 }
 
-// Autocomplete search functions
-function searchCountries(answers, input) {
-	input = input || "";
-	const countries = getNames();
-	return Promise.resolve(
-		countries.filter((country) => country.toLowerCase().includes(input.toLowerCase()))
-	);
-}
-
-function searchCities(answers, input) {
-	input = input || "";
-	const country = answers.country;
-	const cities = citiesByCountry[country] || [];
-	return Promise.resolve(
-		cities.filter((city) => city.toLowerCase().includes(input.toLowerCase()))
-	);
-}
-
-// Main CLI flow
 async function main() {
-	console.log("=== Weather CLI with Autocomplete ===");
+	console.log("=== Weather CLI ===");
 
-	const answers = await inquirer.prompt([
-		{
-			type: "autocomplete",
-			name: "country",
-			message: "Select a Country:",
-			source: searchCountries,
-		},
-		{
-			type: "autocomplete",
-			name: "city",
-			message: "Select a City within the Country:",
-			source: searchCities,
-		},
-	]);
+	const country = readline.question("Enter Country: ").trim();
+	const city = readline.question("Enter City within the Country: ").trim();
 
-	console.log(`\nFetching weather for ${answers.city}, ${answers.country}...`);
+	if (!country || !city) {
+		console.log("Country and City cannot be empty.");
+		return;
+	}
 
-	const weatherData = await getWeather(answers.country, answers.city);
+	console.log(`Fetching weather for ${city}, ${country}...`);
+
+	const weatherData = await getWeather(country, city);
 
 	if (weatherData && weatherData.weather) {
 		console.log(`\nWeather in ${weatherData.name}, ${weatherData.sys.country}:`);
